@@ -25,7 +25,7 @@ const resolvers = {
       return 'Hassan Khan';
     },
     age() {
-      return 21;
+      return 20;
     },
     employed() {
       return true;
