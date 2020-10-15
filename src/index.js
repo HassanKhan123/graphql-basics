@@ -6,11 +6,21 @@ import { GraphQLServer } from 'graphql-yoga';
 //Type Definitions (Schemas)
 const typeDefs = `
     type Query {
-       id:ID!
-       name:String!
-       age:Int!
-       employed:Boolean!
-       gpa:Float
+      me:User!
+      post:Post!
+    }
+
+    type User {
+      id:ID!
+      name:String!
+      age:Int!
+    }
+
+    type Post {
+      id:ID!
+      title:String!
+      body:String!
+      published:Boolean!
     }
 
 `;
@@ -18,21 +28,22 @@ const typeDefs = `
 //Resolvers
 const resolvers = {
   Query: {
-    id() {
-      return 'abc123';
+    me(){
+      return {
+        id:'abc123',
+        name:'Hassan',
+       age:21
+      }
     },
-    name() {
-      return 'Hassan Khan';
-    },
-    age() {
-      return 20;
-    },
-    employed() {
-      return true;
-    },
-    gpa() {
-      return 3.4;
-    },
+    post(){
+      return{
+        id:'12az',
+        title:'GraphQL',
+        body:"Best Place to learn graphQL",
+        published:true
+      }
+    }
+    
   },
 };
 
