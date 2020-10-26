@@ -7,9 +7,11 @@ import { GraphQLServer } from 'graphql-yoga';
 const typeDefs = `
     type Query {
       add(num1:Float!,num2:Float!):Float!
+      sum(numbers:[Float!]!):Float!
       greeting(name:String):String!
       me:User!
       post:Post!
+      grades:[Int!]!
     }
 
     type User {
@@ -37,6 +39,15 @@ const resolvers = {
     add(parent,args,ctx,info){
       let sum = args.num1 + args.num2
       return sum
+    },
+    sum(parent,args,ctx,info){
+      if(args.numbers.length === 0) return 0
+      return args.numbers.reduce((acc,cur) => {
+        return acc+cur
+      })
+    },
+    grades(parent,args,ctx,info){
+      return [1,2,3]
     },
     me(){
       return {
