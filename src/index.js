@@ -8,11 +8,13 @@ const users = [
     id: 'abc124',
     name: 'Hassan',
     age: 21,
+    
   },
   {
     id: 'abc123',
     name: 'Khan',
     age: 22,
+   
   },
 ];
 
@@ -54,7 +56,8 @@ const typeDefs = `
     type User {
       id:ID!
       name:String!
-      age:Int!
+      age:Int!,
+      posts:[Post!]!
     }
 
     type Post {
@@ -122,6 +125,11 @@ const resolvers = {
   Post:{
     author(parent, args, ctx, info){
       return users.find(user => user.id === parent.author)
+    }
+  },
+  User:{
+    posts(parent, args, ctx, info){
+      return posts.filter(post => parent.id === post.author)
     }
   }
 };
