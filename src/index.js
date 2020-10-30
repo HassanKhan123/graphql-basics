@@ -40,6 +40,32 @@ const posts = [
   }
 ]
 
+const comments = [
+  {
+    id:'1',
+    text:'First Comment',
+    author:'abc124',
+    post:'12a1'
+  },
+  {
+    id:'2',
+    text:'Second Comment',
+    author:'abc123',
+    post:'12a1'
+  },
+  {
+    id:'3',
+    text:'Third Comment',
+    author:'abc123',
+    post:'12aa'
+  },
+  {
+    id:'4',
+    text:'Fourth Comment',
+    author:'abc123',
+    post:'12az'
+  },
+]
 //Type Definitions (Schemas)
 const typeDefs = `
     type Query {
@@ -51,6 +77,7 @@ const typeDefs = `
       grades:[Int!]!
       users(query:String):[User!]!
       posts(query:String):[Post!]!
+      comments:[Comment!]!
     }
 
     type User {
@@ -58,6 +85,7 @@ const typeDefs = `
       name:String!
       age:Int!,
       posts:[Post!]!
+      comments:[Comment!]!
     }
 
     type Post {
@@ -66,6 +94,13 @@ const typeDefs = `
       body:String!
       published:Boolean!,
       author:User!
+      comments:[Comment!]!
+    }
+    type Comment{
+      id:ID!
+      text:String!,
+      author:User!,
+      post:Post!
     }
 
 `;
@@ -119,17 +154,36 @@ const resolvers = {
         const isBodyMatch = post.body.toLowerCase().includes(args.query.toLowerCase())
         return isTitleMatch || isBodyMatch 
       })
+    },
+    comments(parent, args, ctx, info){
+      return comments
     }
 
   },
   Post:{
     author(parent, args, ctx, info){
       return users.find(user => user.id === parent.author)
-    }
+    },
+    comments(parent, args, ctx, info){
+      return comments.filter(comment => parent.id === comment.post)
+    },
   },
   User:{
     posts(parent, args, ctx, info){
       return posts.filter(post => parent.id === post.author)
+    },
+    comments(parent, args, ctx, info){
+     
+      return comments.filter(comment => parent.id === comment.author)
+    },
+
+  },
+  Comment:{
+    author(parent, args, ctx, info){
+      return users.find(user => user.id === parent.author)
+    },
+    post(parent, args, ctx, info){
+      return posts.find(post => post.id === parent.post)
     }
   }
 };
