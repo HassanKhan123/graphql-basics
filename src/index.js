@@ -22,16 +22,19 @@ const posts = [
     title: 'GraphQL',
     body: 'Best Place to learn graphQL',
     published: true,
+    author:'abc124'
   },{
     id: '12aa',
     title: 'Node',
     body: 'Great Place to learn Node',
     published: false,
+    author:'abc124'
   },{
     id: '12a1',
     title: 'React',
     body: 'Awesome Place to learn React',
     published: true,
+    author:'abc123'
   }
 ]
 
@@ -58,7 +61,8 @@ const typeDefs = `
       id:ID!
       title:String!
       body:String!
-      published:Boolean!
+      published:Boolean!,
+      author:User!
     }
 
 `;
@@ -115,6 +119,11 @@ const resolvers = {
     }
 
   },
+  Post:{
+    author(parent, args, ctx, info){
+      return users.find(user => user.id === parent.author)
+    }
+  }
 };
 
 const server = new GraphQLServer({
