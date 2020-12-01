@@ -1,4 +1,5 @@
 import { GraphQLServer } from 'graphql-yoga';
+import { v4 as uuidv4 } from 'uuid';
 
 // Types
 // Scalar Types - Strings, Boolean, Int, Float, ID
@@ -8,13 +9,13 @@ const users = [
     id: 'abc124',
     name: 'Hassan',
     age: 21,
-    
+    email: 'hassan@gmail.com',
   },
   {
     id: 'abc123',
     name: 'Khan',
     age: 22,
-   
+    email: 'khan@gmail.com',
   },
 ];
 
@@ -24,48 +25,50 @@ const posts = [
     title: 'GraphQL',
     body: 'Best Place to learn graphQL',
     published: true,
-    author:'abc124'
-  },{
+    author: 'abc124',
+  },
+  {
     id: '12aa',
     title: 'Node',
     body: 'Great Place to learn Node',
     published: false,
-    author:'abc124'
-  },{
+    author: 'abc124',
+  },
+  {
     id: '12a1',
     title: 'React',
     body: 'Awesome Place to learn React',
     published: true,
-    author:'abc123'
-  }
-]
+    author: 'abc123',
+  },
+];
 
 const comments = [
   {
-    id:'1',
-    text:'First Comment',
-    author:'abc124',
-    post:'12a1'
+    id: '1',
+    text: 'First Comment',
+    author: 'abc124',
+    post: '12a1',
   },
   {
-    id:'2',
-    text:'Second Comment',
-    author:'abc123',
-    post:'12a1'
+    id: '2',
+    text: 'Second Comment',
+    author: 'abc123',
+    post: '12a1',
   },
   {
-    id:'3',
-    text:'Third Comment',
-    author:'abc123',
-    post:'12aa'
+    id: '3',
+    text: 'Third Comment',
+    author: 'abc123',
+    post: '12aa',
   },
   {
-    id:'4',
-    text:'Fourth Comment',
-    author:'abc123',
-    post:'12az'
+    id: '4',
+    text: 'Fourth Comment',
+    author: 'abc123',
+    post: '12az',
   },
-]
+];
 //Type Definitions (Schemas)
 const typeDefs = `
     type Query {
@@ -80,10 +83,15 @@ const typeDefs = `
       comments:[Comment!]!
     }
 
+    type Mutation {
+      createUser(name:String!,email:String!,age:Int): User!
+    }
+
     type User {
       id:ID!
       name:String!
-      age:Int!,
+      age:Int,
+      email:String!
       posts:[Post!]!
       comments:[Comment!]!
     }
@@ -141,51 +149,66 @@ const resolvers = {
       };
     },
     users(parent, args, ctx, info) {
-      if(!args.query) return users
-      return users.filter(user => {
-        return user.name.toLowerCase().includes(args.query.toLowerCase())
-      })
-
+      if (!args.query) return users;
+      return users.filter((user) => {
+        return user.name.toLowerCase().includes(args.query.toLowerCase());
+      });
     },
-    posts(parent, args, ctx, info){
-      if(!args.query) return posts
-      return posts.filter(post => {
-        const isTitleMatch = post.title.toLowerCase().includes(args.query.toLowerCase())
-        const isBodyMatch = post.body.toLowerCase().includes(args.query.toLowerCase())
-        return isTitleMatch || isBodyMatch 
-      })
+    posts(parent, args, ctx, info) {
+      if (!args.query) return posts;
+      return posts.filter((post) => {
+        const isTitleMatch = post.title
+          .toLowerCase()
+          .includes(args.query.toLowerCase());
+        const isBodyMatch = post.body
+          .toLowerCase()
+          .includes(args.query.toLowerCase());
+        return isTitleMatch || isBodyMatch;
+      });
     },
-    comments(parent, args, ctx, info){
-      return comments
-    }
-
-  },
-  Post:{
-    author(parent, args, ctx, info){
-      return users.find(user => user.id === parent.author)
-    },
-    comments(parent, args, ctx, info){
-      return comments.filter(comment => parent.id === comment.post)
+    comments(parent, args, ctx, info) {
+      return comments;
     },
   },
-  User:{
-    posts(parent, args, ctx, info){
-      return posts.filter(post => parent.id === post.author)
+  Post: {
+    author(parent, args, ctx, info) {
+      return users.find((user) => user.id === parent.author);
     },
-    comments(parent, args, ctx, info){
-     
-      return comments.filter(comment => parent.id === comment.author)
+    comments(parent, args, ctx, info) {
+      return comments.filter((comment) => parent.id === comment.post);
     },
-
   },
-  Comment:{
-    author(parent, args, ctx, info){
-      return users.find(user => user.id === parent.author)
+  User: {
+    posts(parent, args, ctx, info) {
+      return posts.filter((post) => parent.id === post.author);
     },
-    post(parent, args, ctx, info){
-      return posts.find(post => post.id === parent.post)
-    }
-  }
+    comments(parent, args, ctx, info) {
+      return comments.filter((comment) => parent.id === comment.author);
+    },
+  },
+  Mutation: {
+    createUser(parent, args, ctx, info) {
+      const emailTaken = users.some((user) => user.email === args.email);
+      if (emailTaken) throw new Error('Email Taken');
+      const user = {
+        id: uuidv4(),
+        name: args.name,
+        email: args.email,
+        age: args.age,
+      };
+
+      users.push(user);
+      return user;
+    },
+  },
+  Comment: {
+    author(parent, args, ctx, info) {
+      return users.find((user) => user.id === parent.author);
+    },
+    post(parent, args, ctx, info) {
+      return posts.find((post) => post.id === parent.post);
+    },
+  },
 };
 
 const server = new GraphQLServer({
