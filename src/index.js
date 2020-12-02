@@ -194,9 +194,7 @@ const resolvers = {
       if (emailTaken) throw new Error('Email Taken');
       const user = {
         id: uuidv4(),
-        name: args.name,
-        email: args.email,
-        age: args.age,
+        ...args,
       };
 
       users.push(user);
@@ -207,10 +205,7 @@ const resolvers = {
       if (!userExists) throw new Error('User not found');
       const post = {
         id: uuidv4(),
-        title: args.title,
-        body: args.body,
-        published: args.published,
-        author: args.author,
+        ...args,
       };
 
       posts.push(post);
@@ -225,9 +220,7 @@ const resolvers = {
         throw new Error('Unable to find user and post');
       const comment = {
         id: uuidv4(),
-        text: args.text,
-        author: args.author,
-        post: args.post,
+        ...args,
       };
 
       comments.push(comment);
